@@ -1,0 +1,66 @@
+En  ECCD llamamos a una rutina que lee 5 semifilas de teclado (las que correspondan a arriba,
+abajo, izquierda y derecha), y devuelve en D una máscara de si están pulsadas algunas de las
+teclas definidas, de esta manera:
+
+bit 0 -> abajo
+bit 1 -> arriba
+bit 2 -> derecha
+bit 3 -> izquierda
+bit 4 -> disparo
+
+Notese que si ponemos dos teclas en la misma semifila da igual, se llama a IN 5 veces, aunque dos, 
+tres, o más teclas estén a la misma semifila.
+
+Las direcciones lo que hacen es cambiar el valor de IX+3D (eje X) y IX+3E (Eje Y). El disparo
+lo que hace es meter el valor de D en IX+1B e IX+1C,salvo que previamente IX+1C sea 0, en cuyo 
+caso no hace nada (seguramente alguna opción, la pausa, el salvado de partida o algo pone ese
+IX+1C a 0, para evitar que el disparo genere la accion bajo el cursor)
+
+Se ha comprobado que si en ED2B, que es el final de esta rutina, se cambian los valores de
+IX+3D e IX+3D, el cursor se mueve, así que se puede hacer movimientos a sitios concretos.
+
+La botonera de direcciones y giros tiene las siguientes coordenadas:
+
+| B8,6F | C4,6F | D8,6F |
+-------------------------
+| B8,7D | C4,7D | D8,7D |
+
+Se puede poner un punto de parada en ED22 para solo parar cuando se pulsa disparo, por ejemplo, y hacer pruebas.
+
+
+Formas de meterse por medio
+===========================
+
+Sencilla
+--------
+Una forma sencilla sería hacer que en ECCD en lugar de llamar a      (la rutina que lee las cinco
+semifilas) se llame a una nuestra, que comprube que si está pulsado caps shift y lo anote. Después llama 
+a EA74 para leer las semifilas, y al volver, si caps estaba pulsado lo que hacemos es determinar si estaba
+pulsado, arriba, abajo, izquierda o derecha, poner en IX+3D e IX+3E las coordenadas del botón, y meter un 
+16 en D antes de volver, de modo que el cursor se moverá al botón en cuestión, y ese 16 es como si hubieramos
+pulsado fuego.
+
+Lo bueno de esto es que es moderadamente sencillo. Lo malo, que solo podemos movernos, sin girar, y que además
+el puntero se nos mueve realmente al botón, lo cual puede ser un poco incómodo si queremos tenerlo en una zona 
+para, por ejemplo, atacar, y movernos al tiempo.
+
+En un momento dado se podrían usar un para de  variables en algún sitio, para guardar la última posición de X,Y
+antes de pegarles el cambiazo, de modo que en otro sitio metemos código que si ve que la Y es 0 no hace nada (quiere
+decir que no tenemos que recupeararlas) pero si ve que es !=0 recupera x e y. Como Y no puede ser nunca 0, no
+es problema.
+
+Así, nuestro código, si no da el cambiazo pone un 0 en la variable "saveY", y si da el cambiado pone los valores
+actuales de IX+3D e IX+3E en saveX y saveY. Luego, en otra parte del código, se mira si saveY!=0 y si es así restauramos
+x e y.
+
+Compleja
+--------
+
+DONDE HAY HUECO
+===============
+
+Pues en 1 jugador hay hueco en pantalla, pero no tengo claro que no use parte porque se ven pixeles por ahí (no visualmente
+porque los atributos están a 00). Luego, en FE00 tiene todo lleno de FDs, que es para el vector de interrupción. A priori
+el bus va a estar a FF así que de FE00 a FEFE se podría usar (255 bytes)
+
+
