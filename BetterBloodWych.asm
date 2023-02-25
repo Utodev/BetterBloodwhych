@@ -24,6 +24,7 @@ MouseButtonPort         EQU     $FADF
 MinMouseXVal            EQU     8
 MaxMouseXVal            EQU     248
 WatchDogAddr            EQU     22624                   ; If in the game, this should be a 3, at the group creation screen, other value
+InventoryWatchDog       EQU     22968                   ; If we are not in game, or inventory is open, here won't be a 5 here
 
 LoadADDR                EQU     $8000
 TempADDR                EQU     $4000
@@ -193,7 +194,9 @@ ELSE                                                    ; When we are talking ab
                         RET Z                           ; if no direction key is pressed, extension won't have anything to do
 ENDIF
 
-
+ShortcutsCheck          LD A, (InventoryWatchDog)          ; If the cursors are visible, ther will be a 05 attribute at this position
+                        CP 5
+                        RET NZ
 
                 ; At this point we know a direction key is pressed and the extension has to simulate on-screen direction or rotation buttons press
                 
