@@ -1,6 +1,6 @@
 #/bin/bash
 
-pasmo --tap BetterBloodwych.asm BetterBloodwych.tap file.symbol
+pasmo --equ kmouse=1 --tap BetterBloodwych.asm BetterBloodwych.tap file.symbol
 rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 cat BetterBloodwychBAS.tap BetterBloodwych.tap  > BetterBloodwychLoader.tap
 rc=$?; if [[ $rc != 0 ]]; then rm BetterBloodwychLoader.tap; exit $rc; fi
